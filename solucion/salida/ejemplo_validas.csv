@@ -1,0 +1,12 @@
+INSERT INTO usuarios (login, password,estado) VALUES ('juan_perez1','123456','pendiente');
+INSERT INTO usuarios (login, password,estado) VALUES ('juan_perez2','123456','pendiente');
+INSERT INTO usuarios (login, password,estado) VALUES ('juan_perez3','123457','pendiente');
+INSERT INTO usuarios (login, password,estado) VALUES ('juan_perez4','123458','pendiente');
+INSERT INTO usuarios (login, password,estado) VALUES ('juan_perez5','123459','pendiente');
+SELECT * FROM usuarios WHERE login = 'juan_perez1';
+SELECT login, estado FROM usuarios WHERE login = 'ana_g';
+DELETE FROM usuarios WHERE login = 'juan_perez5';
+SELECT login,estado FROM usuarios WHERE login = 'carlos_m';
+SELECT login,estado FROM usuarios WHERE login = 'user1';
+SELECT * FROM usuarios WHERE estado = 'suspendido' AND login != 'maria99';
+SELECT login, estado FROM usuarios WHERE login = 'carlos_m';

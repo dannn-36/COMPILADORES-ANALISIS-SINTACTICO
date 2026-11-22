@@ -1,0 +1,46 @@
+LABORATORIO A7 - ANALIZADOR ESTÁTICO DE SENTENCIAS SQL (ANTLR + Python)
+=======================================================================
+
+Requisitos: Python 3.10+, Java 11+, MySQL 8 (root / 12345678, base ubosquebd)
+    pip install antlr4-python3-runtime==4.13.2 mysql-connector-python
+
+MySQL con Docker (opcional):
+    docker run -d --name mysql-lab -p 3306:3306 -e MYSQL_ROOT_PASSWORD=12345678 -e MYSQL_DATABASE=ubosquebd mysql:8.0 --lower-case-table-names=1
+    docker start mysql-lab          (las veces siguientes)
+
+Todos los comandos se ejecutan en CMD dentro de esta carpeta (solucion):
+
+1. Generar el parser desde la gramática
+    java -jar antlr-4.13.2-complete.jar -Dlanguage=Python3 -visitor -no-listener MiniSQL.g4
+
+2. Reiniciar la base de datos (script inicial: 16 registros)
+    python bd_util.py reiniciar
+
+3. Procesar un archivo CSV (analiza y ejecuta SOLO las válidas)
+    python ProcesaSQL.py datos\ejemplo.csv
+    python ProcesaSQL.py datos\dataset_sql_usuarios.csv --solo-resumen
+    python ProcesaSQL.py pruebas\casos_extra.csv
+    python ProcesaSQL.py <archivo.csv> --sin-bd        (solo análisis, sin MySQL)
+    python ProcesaSQL.py --ayuda
+
+   Genera en la carpeta salida\:
+    <archivo>_validas.csv     sentencias válidas (una por línea, re-ejecutables)
+    <archivo>_invalidas.csv   linea, sentencia, categoria, motivo
+    <archivo>_reporte.csv     detalle de todas las líneas
+
+4. Generar el script final de la base de datos
+    python bd_util.py exportar        -> bd\ScriptBD_DSL_final.sql
+
+5. Pruebas automáticas
+    python -m unittest pruebas.test_analizador -v
+
+Archivos:
+    MiniSQL.g4            gramática ANTLR (con producciones de error)
+    MiniSQL*.py           lexer / parser / visitor generados por ANTLR 4.13.2
+    analizador.py         fases léxica, sintáctica y semántica + reglas de seguridad
+    esquema.py            tabla de símbolos (estructura de la base)
+    ProcesaSQL.py         script entregado, modificado (análisis previo + ejecución controlada)
+    bd_util.py            reiniciar / exportar la base de datos
+    bd\                   scripts inicial y final de la base de datos
+    datos\                archivos CSV de entrada
+    pruebas\              casos adicionales y pruebas automáticas

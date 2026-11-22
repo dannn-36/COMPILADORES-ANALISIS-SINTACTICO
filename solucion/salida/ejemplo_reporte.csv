@@ -1,0 +1,14 @@
+﻿linea,resultado,categoria,tipo,motivo,ejecucion,sentencia
+1,VALIDA,VALIDA,INSERT,,OK: 1 fila(s) afectada(s),"INSERT INTO usuarios (login, password,estado) VALUES ('juan_perez1','123456','pendiente');"
+2,VALIDA,VALIDA,INSERT,,OK: 1 fila(s) afectada(s),"INSERT INTO usuarios (login, password,estado) VALUES ('juan_perez2','123456','pendiente');"
+3,VALIDA,VALIDA,INSERT,,OK: 1 fila(s) afectada(s),"INSERT INTO usuarios (login, password,estado) VALUES ('juan_perez3','123457','pendiente');"
+4,VALIDA,VALIDA,INSERT,,OK: 1 fila(s) afectada(s),"INSERT INTO usuarios (login, password,estado) VALUES ('juan_perez4','123458','pendiente');"
+5,VALIDA,VALIDA,INSERT,,OK: 1 fila(s) afectada(s),"INSERT INTO usuarios (login, password,estado) VALUES ('juan_perez5','123459','pendiente');"
+6,VALIDA,VALIDA,SELECT,,OK: 2 fila(s) consultada(s),SELECT * FROM usuarios WHERE login = 'juan_perez1';
+7,VALIDA,VALIDA,SELECT,,OK: 1 fila(s) consultada(s),"SELECT login, estado FROM usuarios WHERE login = 'ana_g';"
+8,VALIDA,VALIDA,DELETE,,OK: 1 fila(s) afectada(s),DELETE FROM usuarios WHERE login = 'juan_perez5';
+9,VALIDA,VALIDA,SELECT,,OK: 1 fila(s) consultada(s),"SELECT login,estado FROM usuarios WHERE login = 'carlos_m';"
+10,VALIDA,VALIDA,SELECT,,OK: 1 fila(s) consultada(s),"SELECT login,estado FROM usuarios WHERE login = 'user1';"
+11,VALIDA,VALIDA,SELECT,,OK: 1 fila(s) consultada(s),SELECT * FROM usuarios WHERE estado = 'suspendido' AND login != 'maria99';
+12,VALIDA,VALIDA,SELECT,,OK: 1 fila(s) consultada(s),"SELECT login, estado FROM usuarios WHERE login = 'carlos_m';"
+13,OMITIDA,OMITIDA,,,,

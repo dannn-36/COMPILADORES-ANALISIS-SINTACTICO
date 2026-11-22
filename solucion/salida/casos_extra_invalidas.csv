@@ -1,0 +1,41 @@
+﻿linea,sentencia,categoria,motivo
+22,SELECT * FROM usuarios WHERE login = 'ana_g;,LEXICO,Texto sin comilla de cierre a partir de la posición 38: 'ana_g;
+23,SELECT * FROM usuarios WHERE login = ?;,LEXICO,Carácter no válido '?' en la posición 38.
+24,"SELECT login, FROM usuarios;",SINTACTICO,"Error de sintaxis en la posición 15: sobra 'FROM'; se esperaba un nombre de tabla o columna, un valor o '*'."
+25,SELCT * FROM usuarios;,SINTACTICO,"Instrucción no reconocida 'SELCT' (¿quiso decir SELECT?): una sentencia debe iniciar con SELECT, INSERT, UPDATE, DELETE o DROP."
+26,SELECT * FROM usuarios WHERE estado = 'activo' AND;,SINTACTICO,"Error de sintaxis en la posición 51: se encontró ';' pero se esperaba un nombre de tabla o columna, un valor, NOT o '('."
+27,UPDATE usuarios SET estado 'activo' WHERE login = 'ana_g';,SINTACTICO,Error de sintaxis en la posición 28: falta '=' antes de el texto 'activo'.
+28,"INSERT INTO usuarios VALUES ('a' 'b', 'c');",SINTACTICO,"[SINTACTICO] Textos consecutivos sin separador 'a' 'b': falta la coma que separa los valores. MySQL los uniría en un solo texto ('ab'). | [SEMANTICO] La cantidad de valores no coincide con la de columnas: la tabla tiene 3 columna(s) (login, password, estado) pero se dieron 2 valor(es) (MySQL error 1136)."
+29,SELECT * FROM clientes WHERE id = 1;,SEMANTICO,La tabla 'clientes' no existe en la base de datos 'ubosquebd'.
+30,SELECT nombre FROM usuarios;,SEMANTICO,"La columna 'nombre' no existe en la tabla 'usuarios'. Columnas disponibles: login, password, estado."
+31,"SELECT login, COUNT(*) FROM usuarios;",SEMANTICO,La consulta mezcla funciones de agregación con la columna 'login' sin GROUP BY (MySQL error 1140).
+32,SELECT x.login FROM usuarios u;,SEMANTICO,'x.login': 'x' no corresponde a la tabla (o alias) usada en la sentencia.
+33,"INSERT INTO usuarios VALUES ('pedro', '123');",SEMANTICO,"La cantidad de valores no coincide con la de columnas: la tabla tiene 3 columna(s) (login, password, estado) pero se dieron 2 valor(es) (MySQL error 1136)."
+34,"INSERT INTO usuarios (login, clave, estado) VALUES ('pedro', '1', 'activo');",SEMANTICO,"[SEMANTICO] La columna 'clave' no existe en la tabla 'usuarios'. Columnas disponibles: login, password, estado. | [SEMANTICO] No se indicó valor para la(s) columna(s) obligatoria(s) password (NOT NULL y sin valor por defecto): MySQL rechazaría la inserción (error 1364)."
+35,"INSERT INTO usuarios VALUES ('usuario_con_nombre_largo', '123', 'activo');",SEMANTICO,"El valor 'usuario_con_nombre_largo' tiene 24 caracteres y la columna 'login' es varchar(15) NOT NULL: excede la longitud máxima (MySQL error 1406, Data too long)."
+36,"INSERT INTO usuarios VALUES ('pedro', NULL, 'activo');",SEMANTICO,La columna 'password' es NOT NULL y no admite el valor NULL (MySQL error 1048).
+37,"INSERT INTO usuarios (login, login, estado) VALUES ('a', 'b', 'c');",SEMANTICO,[SEMANTICO] La columna 'login' se indica más de una vez en el INSERT (MySQL error 1110). | [SEMANTICO] No se indicó valor para la(s) columna(s) obligatoria(s) password (NOT NULL y sin valor por defecto): MySQL rechazaría la inserción (error 1364).
+38,"INSERT INTO usuarios VALUES ('a', 'b', 'c'), ('d', 'e');",SEMANTICO,"La cantidad de valores no coincide con la de columnas en la fila 2: la tabla tiene 3 columna(s) (login, password, estado) pero se dieron 2 valor(es) (MySQL error 1136)."
+39,UPDATE usuarios SET nombre = 'x' WHERE login = 'ana_g';,SEMANTICO,"La columna 'nombre' no existe en la tabla 'usuarios'. Columnas disponibles: login, password, estado."
+40,UPDATE usuarios SET password = 'una_clave_demasiado_larga' WHERE login = 'ana_g';,SEMANTICO,"El valor 'una_clave_demasiado_larga' tiene 25 caracteres y la columna 'password' es varchar(15) NOT NULL: excede la longitud máxima (MySQL error 1406, Data too long)."
+41,UPDATE usuarios SET estado = NULL WHERE login = 'ana_g';,SEMANTICO,La columna 'estado' es NOT NULL y no admite el valor NULL (MySQL error 1048).
+42,"UPDATE usuarios SET estado = 'activo', estado = 'inactivo' WHERE login = 'ana_g';",SEMANTICO,La columna 'estado' se asigna más de una vez en el UPDATE (la primera asignación se perdería).
+43,SELECT * FROM usuarios WHERE login = 'admin' OR '1'='1';,PELIGROSA,La condición WHERE login = 'admin' OR '1'='1' contiene un OR con una expresión siempre verdadera (p. ej. OR 1=1): patrón típico de inyección SQL que expone todos los registros.
+44,SELECT * FROM usuarios WHERE login = 'admin' OR 1=1;,PELIGROSA,La condición WHERE login = 'admin' OR 1=1 contiene un OR con una expresión siempre verdadera (p. ej. OR 1=1): patrón típico de inyección SQL que expone todos los registros.
+45,SELECT * FROM usuarios; DROP TABLE usuarios;,PELIGROSA,"[PELIGROSA] La línea contiene 2 sentencias separadas por ';'. Solo se permite una sentencia por línea (las sentencias apiladas son una técnica de inyección SQL). | [PELIGROSA] DROP TABLE usuarios: aunque la sintaxis sea válida, eliminaría la tabla y TODOS sus registros. Una sentencia destructiva de estructura nunca se ejecuta desde este proceso."
+46,SELECT * FROM usuarios WHERE login = 'x' AND SLEEP(5);,PELIGROSA,La función SLEEP() no está permitida: detiene el servidor (ataque de denegación de servicio / inyección a ciegas).
+47,"INSERT INTO usuarios VALUES ('admin', 'x', 'activo') /*! , ('h','h','h') */;",PELIGROSA,"Comentario ejecutable de MySQL /*! , ('h','h','h') */: MySQL ejecuta su contenido (técnica de inyección SQL)."
+48,UPDATE usuarios SET estado = 'activo';,PELIGROSA,UPDATE sin cláusula WHERE: actualización masiva que afectaría TODOS los registros de la tabla.
+49,UPDATE usuarios SET estado = 'activo' WHERE 1=1;,PELIGROSA,UPDATE con una condición que siempre es verdadera (WHERE 1=1): actualización masiva de todos los registros.
+50,UPDATE usuarios SET estado = 'activo' WHERE login = 'ana_g' OR 1=1;,PELIGROSA,UPDATE con una condición que siempre es verdadera (WHERE login = 'ana_g' OR 1=1): actualización masiva de todos los registros.
+51,UPDATE usuarios SET estado = 'activo' WHERE login LIKE '%';,PELIGROSA,UPDATE con una condición que siempre es verdadera (WHERE login LIKE '%'): actualización masiva de todos los registros.
+52,UPDATE usuarios SET estado = 'activo' WHERE estado = 'inactivo';,PELIGROSA,"Actualización masiva: la condición WHERE estado = 'inactivo' no filtra por la columna identificadora (login) con '=' o IN, por lo que puede afectar muchos registros a la vez."
+53,DELETE FROM usuarios;,PELIGROSA,DELETE sin cláusula WHERE: eliminación masiva que afectaría TODOS los registros de la tabla.
+54,DELETE FROM usuarios WHERE login != 'admin';,PELIGROSA,"Eliminación masiva: la condición WHERE login != 'admin' no filtra por la columna identificadora (login) con '=' o IN, por lo que puede afectar muchos registros a la vez."
+55,DELETE FROM usuarios WHERE login = 'guest' OR estado = 'inactivo';,PELIGROSA,"Eliminación masiva: la condición WHERE login = 'guest' OR estado = 'inactivo' no filtra por la columna identificadora (login) con '=' o IN, por lo que puede afectar muchos registros a la vez."
+56,TRUNCATE TABLE usuarios;,PELIGROSA,TRUNCATE usuarios: borraría TODOS los registros de la tabla sin posibilidad de deshacerlo.
+57,ALTER TABLE usuarios ADD COLUMN edad INT;,PELIGROSA,"La instrucción ALTER no está permitida: modifica la estructura de la tabla. El procesador solo ejecuta SELECT, INSERT, UPDATE y DELETE."
+58,CREATE TABLE prueba (id INT);,PELIGROSA,"La instrucción CREATE no está permitida: crea objetos en la base de datos. El procesador solo ejecuta SELECT, INSERT, UPDATE y DELETE."
+59,DROP DATABASE ubosquebd;,PELIGROSA,DROP DATABASE eliminaría la base de datos completa. Nunca se ejecuta desde este proceso.
+60,GRANT ALL ON *.* TO 'x'@'%';,PELIGROSA,"La instrucción GRANT no está permitida: otorga permisos a usuarios. El procesador solo ejecuta SELECT, INSERT, UPDATE y DELETE."
+61,SHOW TABLES;,NO_SOPORTADA,"La instrucción SHOW no está soportada: el procesador solo ejecuta SELECT, INSERT, UPDATE y DELETE."
